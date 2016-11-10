@@ -1,0 +1,14 @@
+machine:
+  services:
+    - docker
+dependencies:
+  cache_directories:
+    - "~/docker"
+  override:
+    - docker info
+    - if [[ -e ~/docker/image.tar ]]; then docker load --input ~/docker/image.tar; fi
+    - docker build --tag stefaniuk/openwrt-build .
+    - mkdir -p ~/docker; docker save stefaniuk/openwrt-build > ~/docker/image.tar
+test:
+  override:
+    - docker run --interactive --tty stefaniuk/openwrt-build ps aux | grep "default.\+ps aux"
